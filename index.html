@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mera Pyara Bhai</title>
+    <style>
+        :root {
+            --bg-color: #FFF5F7;
+            --card-bg: #FFFFFF;
+            --primary: #FF477E;
+            --primary-hover: #E03E6D;
+            --text-main: #2D3748;
+            --text-muted: #718096;
+            --yes-color: #48BB78;
+            --no-color: #F56565;
+            --shadow: 0 8px 30px rgba(255, 71, 126, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .question-box {
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: clamp(20px, 5vw, 24px);
+            line-height: 1.4;
+            color: var(--text-main);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: transform 0.1s ease, opacity 0.2s ease;
+            min-height: 56px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-yes {
+            background-color: var(--yes-color);
+        }
+
+        .btn-no {
+            background-color: var(--no-color);
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .name-input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Popup Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .popup {
+            background: white;
+            width: 100%;
+            max-width: 360px;
+            padding: 32px 24px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .overlay.active .popup {
+            transform: scale(1);
+        }
+
+        .popup h3 {
+            font-size: clamp(20px, 5vw, 24px);
+            color: var(--primary);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .popup .emojis {
+            font-size: 32px;
+            margin-top: 12px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Name Input Screen -->
+    <div class="container" id="name-container">
+        <h2 style="margin-bottom: 12px;">Mera Pyara Bhai ❤️</h2>
+        <p style="margin-bottom: 20px; color: var(--text-muted);">Pehle apna naam bata, phir dosti ki pariksha shuru karte hain!</p>
+        <input type="text" id="friend-name-input" class="name-input" placeholder="Apna naam likh yahan..." autocomplete="off">
+        <button class="btn btn-yes" style="width: 100%; flex: none;" onclick="startQuiz()">Shuru Karein 🚀</button>
+    </div>
+
+    <!-- Quiz Container -->
+    <div class="container hidden" id="app-container">
+        <div class="progress" id="progress-text">Sawaal 1 / 20</div>
+        <div class="question-box">
+            <h2 id="question-text">Kya tujhe yaad hai humne pehli baar kab bunk kiya tha?</h2>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-yes" onclick="nextQuestion()">Haan! 👍</button>
+            <button class="btn btn-no" onclick="nextQuestion()">Naah 👎</button>
+        </div>
+    </div>
+
+    <!-- Popup -->
+    <div class="overlay" id="popup-overlay">
+        <div class="popup">
+            <h3 id="popup-msg">Saala Bhadwa nikal ja yaha se Chutiya</h3>
+            <div class="emojis">🤣🤣🤣🔥🔥🔥</div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            "Kya tujhe yaad hai humne pehli baar kab bunk kiya tha?",
+            "Kya meri beizzati par tujhe sabse zyada hasi aati hai?",
+            "Kya tu apne secret mujhse chupata hai?",
+            "Kya tujhe lagta hai ki main duniya ka sabse achha dost hoon?",
+            "Kya humari dosti hamesha aisi hi rahegi?",
+            "Kya tu bina bataye mera phone check kar sakta hai?",
+            "Kya tujhe meri gandi shayari pasand aati hai?",
+            "Kya humne kabhi kisi baat par lath-latha ladaai ki hai?",
+            "Kya tu apne dukh mujhse share karta hai?",
+            "Kya tujhe free ka khana milne par sabse pehle main yaad aata hoon?",
+            "Kya humari late night talks legendary hoti hain?",
+            "Kya tu kisi din bohot bada aadmi banne ke baad mujhe bhool jayega?",
+            "Kya tujhe lagta hai ki hum dono milke duniya hila sakte hain?",
+            "Kya mera mazak tujhe sach me bura lagta hai kabhi?",
+            "Kya tu meri har bewakoofi me mera sath deta hai?",
+            "Kya tujhe chai se zyada dosti pyari hai?",
+            "Kya tu meri kasam kha ke keh sakta hai ki tu sach bol raha hai?",
+            "Kya hum budhe hone ke baad bhi sath me chai piyenge?",
+            "Kya tera mera bhai jaisa rishta hamesha rahega?",
+            "Kya tu maanta hai ki mere jaisa dost milna namumkin hai?"
+        ];
+
+        let currentIndex = 0;
+        let isSurpriseStage = false;
+        let friendName = "";
+
+        const nameContainer = document.getElementById("name-container");
+        const appContainer = document.getElementById("app-container");
+        const friendNameInput = document.getElementById("friend-name-input");
+        const progressText = document.getElementById("progress-text");
+        const questionText = document.getElementById("question-text");
+        const popupOverlay = document.getElementById("popup-overlay");
+        const popupMsg = document.getElementById("popup-msg");
+
+        function startQuiz() {
+            const nameVal = friendNameInput.value.trim();
+            if (!nameVal) {
+                friendNameInput.style.borderColor = "var(--no-color)";
+                friendNameInput.placeholder = "Naam likhna zaroori hai bhai!";
+                return;
+            }
+            friendName = nameVal;
+            nameContainer.classList.add("hidden");
+            appContainer.classList.remove("hidden");
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            
+            if (currentIndex < questions.length) {
+                progressText.textContent = `Sawaal ${currentIndex + 1} / 20`;
+                questionText.textContent = questions[currentIndex];
+            } else if (!isSurpriseStage) {
+                isSurpriseStage = true;
+                progressText.textContent = "Bonus!";
+                questionText.textContent = `Bhai ${friendName}, tere liye ek surprise hai... dekhega kya?`;
+            } else {
+                showPopup();
+            }
+        }
+
+        function showPopup() {
+            popupMsg.textContent = `Arre ${friendName}, sun toh... Saala Bhadwa nikal ja yaha se Chutiya! 😂`;
+            popupOverlay.classList.add("active");
+        }
+    </script>
+</body>
+</html>
